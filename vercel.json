@@ -7,92 +7,114 @@
       "dest": "/api/health"
     },
     {
-      "src": "/api/upload",
-      "dest": "https://your-cdn.vercel.app/api/upload"
+      "src": "^/api/upload$",
+      "dest": "${CDN_ORIGIN}/api/upload",
+      "env": ["CDN_ORIGIN"]
     },
     {
-      "src": "/api/upload/(.*)",
-      "dest": "https://your-cdn.vercel.app/api/upload/$1"
+      "src": "^/api/upload/(.*)$",
+      "dest": "${CDN_ORIGIN}/api/upload/$1",
+      "env": ["CDN_ORIGIN"]
     },
     {
-      "src": "/api/read",
-      "dest": "https://your-cdn.vercel.app/api/read"
+      "src": "^/api/read$",
+      "dest": "${CDN_ORIGIN}/api/read",
+      "env": ["CDN_ORIGIN"]
     },
     {
-      "src": "/api/read/(.*)",
-      "dest": "https://your-cdn.vercel.app/api/read/$1"
+      "src": "^/api/read/(.*)$",
+      "dest": "${CDN_ORIGIN}/api/read/$1",
+      "env": ["CDN_ORIGIN"]
     },
     {
-      "src": "/config",
-      "dest": "https://tripsi-config.vercel.app/config"
+      "src": "^/config$",
+      "dest": "${CONFIG_ORIGIN}/config",
+      "env": ["CONFIG_ORIGIN"]
     },
     {
-      "src": "/config/(.*)",
-      "dest": "https://tripsi-config.vercel.app/config/$1"
+      "src": "^/config/(.*)$",
+      "dest": "${CONFIG_ORIGIN}/config/$1",
+      "env": ["CONFIG_ORIGIN"]
     },
     {
-      "src": "/internal",
-      "dest": "https://tripsi-config.vercel.app/internal"
+      "src": "^/internal$",
+      "dest": "${CONFIG_ORIGIN}/internal",
+      "env": ["CONFIG_ORIGIN"]
     },
     {
-      "src": "/internal/(.*)",
-      "dest": "https://tripsi-config.vercel.app/internal/$1"
+      "src": "^/internal/(.*)$",
+      "dest": "${CONFIG_ORIGIN}/internal/$1",
+      "env": ["CONFIG_ORIGIN"]
     },
     {
-      "src": "/posts",
-      "dest": "https://your-post.vercel.app/posts"
+      "src": "^/posts$",
+      "dest": "${POST_ORIGIN}/posts",
+      "env": ["POST_ORIGIN"]
     },
     {
-      "src": "/posts/(.*)",
-      "dest": "https://your-post.vercel.app/posts/$1"
+      "src": "^/posts/(.*)$",
+      "dest": "${POST_ORIGIN}/posts/$1",
+      "env": ["POST_ORIGIN"]
     },
     {
-      "src": "/stories",
-      "dest": "https://your-stories.vercel.app/stories"
+      "src": "^/stories$",
+      "dest": "${STORIES_ORIGIN}/stories",
+      "env": ["STORIES_ORIGIN"]
     },
     {
-      "src": "/stories/(.*)",
-      "dest": "https://your-stories.vercel.app/stories/$1"
+      "src": "^/stories/(.*)$",
+      "dest": "${STORIES_ORIGIN}/stories/$1",
+      "env": ["STORIES_ORIGIN"]
     },
     {
-      "src": "/users",
-      "dest": "https://your-users.vercel.app/users"
+      "src": "^/users$",
+      "dest": "${USER_MANAGEMENT_ORIGIN}/users",
+      "env": ["USER_MANAGEMENT_ORIGIN"]
     },
     {
-      "src": "/users/(.*)",
-      "dest": "https://your-users.vercel.app/users/$1"
+      "src": "^/users/(.*)$",
+      "dest": "${USER_MANAGEMENT_ORIGIN}/users/$1",
+      "env": ["USER_MANAGEMENT_ORIGIN"]
     },
     {
-      "src": "/spots",
-      "dest": "https://your-spots.vercel.app/spots"
+      "src": "^/spots$",
+      "dest": "${SPOTS_ORIGIN}/spots",
+      "env": ["SPOTS_ORIGIN"]
     },
     {
-      "src": "/spots/(.*)",
-      "dest": "https://your-spots.vercel.app/spots/$1"
+      "src": "^/spots/(.*)$",
+      "dest": "${SPOTS_ORIGIN}/spots/$1",
+      "env": ["SPOTS_ORIGIN"]
     },
     {
-      "src": "/spot",
-      "dest": "https://your-spots.vercel.app/spot"
+      "src": "^/spot$",
+      "dest": "${SPOTS_ORIGIN}/spot",
+      "env": ["SPOTS_ORIGIN"]
     },
     {
-      "src": "/spot/(.*)",
-      "dest": "https://your-spots.vercel.app/spot/$1"
+      "src": "^/spot/(.*)$",
+      "dest": "${SPOTS_ORIGIN}/spot/$1",
+      "env": ["SPOTS_ORIGIN"]
     },
     {
-      "src": "/review",
-      "dest": "https://your-spots.vercel.app/review"
+      "src": "^/review$",
+      "dest": "${SPOTS_ORIGIN}/review",
+      "env": ["SPOTS_ORIGIN"]
     },
     {
-      "src": "/review/(.*)",
-      "dest": "https://your-spots.vercel.app/review/$1"
+      "src": "^/review/(.*)$",
+      "dest": "${SPOTS_ORIGIN}/review/$1",
+      "env": ["SPOTS_ORIGIN"]
     },
     {
-      "src": "/reviews",
-      "dest": "https://your-spots.vercel.app/reviews"
+      "src": "^/reviews$",
+      "dest": "${SPOTS_ORIGIN}/reviews",
+      "env": ["SPOTS_ORIGIN"]
     },
     {
-      "src": "/reviews/(.*)",
-      "dest": "https://your-spots.vercel.app/reviews/$1"
+      "src": "^/reviews/(.*)$",
+      "dest": "${SPOTS_ORIGIN}/reviews/$1",
+      "env": ["SPOTS_ORIGIN"]
     }
   ]
 }

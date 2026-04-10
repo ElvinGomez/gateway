@@ -2,17 +2,16 @@
   "name": "tripsi-api-gateway",
   "version": "1.0.0",
   "private": true,
-  "description": "Vercel API gateway: build-time external rewrites to microservices",
+  "description": "Vercel API gateway: routes in vercel.json with ${ORIGIN} from env",
   "scripts": {
-    "build": "node scripts/generate-vercel-config.mjs && tsc",
-    "vercel-build": "node scripts/generate-vercel-config.mjs && tsc"
+    "build": "tsc",
+    "vercel-build": "tsc"
   },
   "dependencies": {
     "@vercel/node": "^3.2.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
-    "dotenv": "^17.4.1",
     "typescript": "^5.6.3"
   },
   "engines": {
