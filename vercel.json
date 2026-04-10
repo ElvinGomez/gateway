@@ -7,113 +7,53 @@
       "dest": "/api/health"
     },
     {
-      "src": "^/api/upload$",
-      "dest": "${CDN_ORIGIN}/api/upload",
+      "src": "^/api/upload(?=/|$)(.*)$",
+      "dest": "${CDN_ORIGIN}/api/upload$1",
       "env": ["CDN_ORIGIN"]
     },
     {
-      "src": "^/api/upload/(.*)$",
-      "dest": "${CDN_ORIGIN}/api/upload/$1",
+      "src": "^/api/read(?=/|$)(.*)$",
+      "dest": "${CDN_ORIGIN}/api/read$1",
       "env": ["CDN_ORIGIN"]
     },
     {
-      "src": "^/api/read$",
-      "dest": "${CDN_ORIGIN}/api/read",
-      "env": ["CDN_ORIGIN"]
-    },
-    {
-      "src": "^/api/read/(.*)$",
-      "dest": "${CDN_ORIGIN}/api/read/$1",
-      "env": ["CDN_ORIGIN"]
-    },
-    {
-      "src": "^/config$",
-      "dest": "${CONFIG_ORIGIN}/config",
+      "src": "^/(config|internal)(?=/|$)(.*)$",
+      "dest": "${CONFIG_ORIGIN}/$1$2",
       "env": ["CONFIG_ORIGIN"]
     },
     {
-      "src": "^/config/(.*)$",
-      "dest": "${CONFIG_ORIGIN}/config/$1",
-      "env": ["CONFIG_ORIGIN"]
-    },
-    {
-      "src": "^/internal$",
-      "dest": "${CONFIG_ORIGIN}/internal",
-      "env": ["CONFIG_ORIGIN"]
-    },
-    {
-      "src": "^/internal/(.*)$",
-      "dest": "${CONFIG_ORIGIN}/internal/$1",
-      "env": ["CONFIG_ORIGIN"]
-    },
-    {
-      "src": "^/posts$",
-      "dest": "${POST_ORIGIN}/posts",
+      "src": "^/posts(?=/|$)(.*)$",
+      "dest": "${POST_ORIGIN}/posts$1",
       "env": ["POST_ORIGIN"]
     },
     {
-      "src": "^/posts/(.*)$",
-      "dest": "${POST_ORIGIN}/posts/$1",
-      "env": ["POST_ORIGIN"]
-    },
-    {
-      "src": "^/stories$",
-      "dest": "${STORIES_ORIGIN}/stories",
+      "src": "^/stories(?=/|$)(.*)$",
+      "dest": "${STORIES_ORIGIN}/stories$1",
       "env": ["STORIES_ORIGIN"]
     },
     {
-      "src": "^/stories/(.*)$",
-      "dest": "${STORIES_ORIGIN}/stories/$1",
-      "env": ["STORIES_ORIGIN"]
-    },
-    {
-      "src": "^/users$",
-      "dest": "${USER_MANAGEMENT_ORIGIN}/users",
+      "src": "^/users(?=/|$)(.*)$",
+      "dest": "${USER_MANAGEMENT_ORIGIN}/users$1",
       "env": ["USER_MANAGEMENT_ORIGIN"]
     },
     {
-      "src": "^/users/(.*)$",
-      "dest": "${USER_MANAGEMENT_ORIGIN}/users/$1",
-      "env": ["USER_MANAGEMENT_ORIGIN"]
-    },
-    {
-      "src": "^/spots$",
-      "dest": "${SPOTS_ORIGIN}/spots",
+      "src": "^/spots(?=/|$)(.*)$",
+      "dest": "${SPOTS_ORIGIN}/spots$1",
       "env": ["SPOTS_ORIGIN"]
     },
     {
-      "src": "^/spots/(.*)$",
-      "dest": "${SPOTS_ORIGIN}/spots/$1",
+      "src": "^/spot(?=/|$)(.*)$",
+      "dest": "${SPOTS_ORIGIN}/spot$1",
       "env": ["SPOTS_ORIGIN"]
     },
     {
-      "src": "^/spot$",
-      "dest": "${SPOTS_ORIGIN}/spot",
+      "src": "^/reviews(?=/|$)(.*)$",
+      "dest": "${SPOTS_ORIGIN}/reviews$1",
       "env": ["SPOTS_ORIGIN"]
     },
     {
-      "src": "^/spot/(.*)$",
-      "dest": "${SPOTS_ORIGIN}/spot/$1",
-      "env": ["SPOTS_ORIGIN"]
-    },
-    {
-      "src": "^/review$",
-      "dest": "${SPOTS_ORIGIN}/review",
-      "env": ["SPOTS_ORIGIN"]
-    },
-    {
-      "src": "^/review/(.*)$",
-      "dest": "${SPOTS_ORIGIN}/review/$1",
-      "env": ["SPOTS_ORIGIN"]
-    },
-    {
-      "src": "^/reviews$",
-      "dest": "${SPOTS_ORIGIN}/reviews",
-      "env": ["SPOTS_ORIGIN"]
-    },
-    {
-      "src": "^/reviews/(.*)$",
-      "dest": "${SPOTS_ORIGIN}/reviews/$1",
+      "src": "^/review(?=/|$)(.*)$",
+      "dest": "${SPOTS_ORIGIN}/review$1",
       "env": ["SPOTS_ORIGIN"]
     }
   ]
