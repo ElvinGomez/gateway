@@ -6,9 +6,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import dotenv from 'dotenv';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const gatewayRoot = path.join(__dirname, '..');
+dotenv.config({ path: path.join(gatewayRoot, '.env') });
+
 const outFile = path.join(gatewayRoot, 'vercel.json');
 
 const REQUIRED = [
