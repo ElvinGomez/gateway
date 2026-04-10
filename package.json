@@ -1,0 +1,20 @@
+{
+  "name": "tripsi-api-gateway",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vercel API gateway: build-time external rewrites to microservices",
+  "scripts": {
+    "build": "node scripts/generate-vercel-config.mjs && tsc --noEmit",
+    "vercel-build": "node scripts/generate-vercel-config.mjs && tsc --noEmit"
+  },
+  "dependencies": {
+    "@vercel/node": "^3.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
