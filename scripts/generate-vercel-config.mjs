@@ -62,7 +62,11 @@ function main() {
   /** @type {{ source: string, destination: string }[]} */
   const rewrites = [{ source: '/health', destination: '/api/health' }];
 
-  /** Exact path + `/:path*` so `/resource` and `/resource/...` both proxy. */
+  /**
+   * Exact path + regex rest so `/resource` and `/resource/...` both proxy.
+   * Uses `(.*)` + `$1` instead of `:path*` — external rewrites with `:path*`
+   * are unreliable on some Vercel deployments (NOT_FOUND before origin).
+   */
   function addPassthrough(origin, basePath) {
     const b = basePath.replace(/^\/+/, '');
     rewrites.push({
@@ -70,8 +74,8 @@ function main() {
       destination: `${origin}/${b}`,
     });
     rewrites.push({
-      source: `/${b}/:path*`,
-      destination: `${origin}/${b}/:path*`,
+      source: `/${b}/(.*)`,
+      destination: `${origin}/${b}/$1`,
     });
   }
 
