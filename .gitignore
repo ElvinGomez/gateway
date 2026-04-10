@@ -1,5 +1,5 @@
 node_modules
-vercel.json
+# vercel.json
 # Dependencies
 node_modules/
 package-lock.json

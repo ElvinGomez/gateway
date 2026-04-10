@@ -1,0 +1,98 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "outputDirectory": "public",
+  "routes": [
+    {
+      "src": "/health",
+      "dest": "/api/health"
+    },
+    {
+      "src": "/api/upload",
+      "dest": "https://your-cdn.vercel.app/api/upload"
+    },
+    {
+      "src": "/api/upload/(.*)",
+      "dest": "https://your-cdn.vercel.app/api/upload/$1"
+    },
+    {
+      "src": "/api/read",
+      "dest": "https://your-cdn.vercel.app/api/read"
+    },
+    {
+      "src": "/api/read/(.*)",
+      "dest": "https://your-cdn.vercel.app/api/read/$1"
+    },
+    {
+      "src": "/config",
+      "dest": "https://tripsi-config.vercel.app/config"
+    },
+    {
+      "src": "/config/(.*)",
+      "dest": "https://tripsi-config.vercel.app/config/$1"
+    },
+    {
+      "src": "/internal",
+      "dest": "https://tripsi-config.vercel.app/internal"
+    },
+    {
+      "src": "/internal/(.*)",
+      "dest": "https://tripsi-config.vercel.app/internal/$1"
+    },
+    {
+      "src": "/posts",
+      "dest": "https://your-post.vercel.app/posts"
+    },
+    {
+      "src": "/posts/(.*)",
+      "dest": "https://your-post.vercel.app/posts/$1"
+    },
+    {
+      "src": "/stories",
+      "dest": "https://your-stories.vercel.app/stories"
+    },
+    {
+      "src": "/stories/(.*)",
+      "dest": "https://your-stories.vercel.app/stories/$1"
+    },
+    {
+      "src": "/users",
+      "dest": "https://your-users.vercel.app/users"
+    },
+    {
+      "src": "/users/(.*)",
+      "dest": "https://your-users.vercel.app/users/$1"
+    },
+    {
+      "src": "/spots",
+      "dest": "https://your-spots.vercel.app/spots"
+    },
+    {
+      "src": "/spots/(.*)",
+      "dest": "https://your-spots.vercel.app/spots/$1"
+    },
+    {
+      "src": "/spot",
+      "dest": "https://your-spots.vercel.app/spot"
+    },
+    {
+      "src": "/spot/(.*)",
+      "dest": "https://your-spots.vercel.app/spot/$1"
+    },
+    {
+      "src": "/review",
+      "dest": "https://your-spots.vercel.app/review"
+    },
+    {
+      "src": "/review/(.*)",
+      "dest": "https://your-spots.vercel.app/review/$1"
+    },
+    {
+      "src": "/reviews",
+      "dest": "https://your-spots.vercel.app/reviews"
+    },
+    {
+      "src": "/reviews/(.*)",
+      "dest": "https://your-spots.vercel.app/reviews/$1"
+    }
+  ]
+}
