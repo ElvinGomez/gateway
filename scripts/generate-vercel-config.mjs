@@ -87,8 +87,12 @@ function main() {
   addPassthrough(SPOTS_ORIGIN, 'review');
   addPassthrough(SPOTS_ORIGIN, 'reviews');
 
+  // Vercel expects this directory when Output Directory is "public" (default for Other/static).
+  fs.mkdirSync(path.join(gatewayRoot, 'public'), { recursive: true });
+
   const vercelJson = {
     $schema: 'https://openapi.vercel.sh/vercel.json',
+    outputDirectory: 'public',
     rewrites,
   };
 
