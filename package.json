@@ -4,8 +4,8 @@
   "private": true,
   "description": "Vercel API gateway: build-time external rewrites to microservices",
   "scripts": {
-    "build": "node scripts/generate-vercel-config.mjs && tsc --noEmit",
-    "vercel-build": "node scripts/generate-vercel-config.mjs && tsc --noEmit"
+    "build": "node scripts/generate-vercel-config.mjs && tsc",
+    "vercel-build": "node scripts/generate-vercel-config.mjs && tsc"
   },
   "dependencies": {
     "@vercel/node": "^3.2.0"
