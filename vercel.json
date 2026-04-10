@@ -7,13 +7,18 @@
       "dest": "/api/health"
     },
     {
-      "src": "^/api/upload(?=/|$)(.*)$",
-      "dest": "${CDN_ORIGIN}/api/upload$1",
+      "src": "^/file/upload(?=/|$)(.*)$",
+      "dest": "${CDN_ORIGIN}/file/upload$1",
       "env": ["CDN_ORIGIN"]
     },
     {
-      "src": "^/api/read(?=/|$)(.*)$",
-      "dest": "${CDN_ORIGIN}/api/read$1",
+      "src": "^/file/read(?=/|$)(.*)$",
+      "dest": "${CDN_ORIGIN}/file/read$1",
+      "env": ["CDN_ORIGIN"]
+    },
+    {
+      "src": "^/file/internal(?=/|$)(.*)$",
+      "dest": "${CDN_ORIGIN}/file/internal$1",
       "env": ["CDN_ORIGIN"]
     },
     {
