@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Emits gateway/vercel.json with external rewrites from process.env at build time.
+ * Emits gateway/vercel.json with legacy `routes` (src/dest) from process.env at build time.
+ * Matches behavior that works on Vercel for this project (see /health → /api/health).
  * Required env: CDN_ORIGIN, CONFIG_ORIGIN, POST_ORIGIN, SPOTS_ORIGIN, STORIES_ORIGIN, USER_MANAGEMENT_ORIGIN
  */
 import fs from 'node:fs';
@@ -59,23 +60,23 @@ function main() {
     USER_MANAGEMENT_ORIGIN,
   } = origins;
 
-  /** @type {{ source: string, destination: string }[]} */
-  const rewrites = [{ source: '/health', destination: '/api/health' }];
+  /** @type {{ src: string, dest: string }[]} */
+  const routes = [{ src: '/health', dest: '/api/health' }];
 
   /**
    * Exact path + regex rest so `/resource` and `/resource/...` both proxy.
-   * Uses `(.*)` + `$1` instead of `:path*` — external rewrites with `:path*`
+   * Uses `(.*)` + `$1` instead of `:path*` — external routes with `:path*`
    * are unreliable on some Vercel deployments (NOT_FOUND before origin).
    */
   function addPassthrough(origin, basePath) {
     const b = basePath.replace(/^\/+/, '');
-    rewrites.push({
-      source: `/${b}`,
-      destination: `${origin}/${b}`,
+    routes.push({
+      src: `/${b}`,
+      dest: `${origin}/${b}`,
     });
-    rewrites.push({
-      source: `/${b}/(.*)`,
-      destination: `${origin}/${b}/$1`,
+    routes.push({
+      src: `/${b}/(.*)`,
+      dest: `${origin}/${b}/$1`,
     });
   }
 
@@ -97,7 +98,7 @@ function main() {
   const vercelJson = {
     $schema: 'https://openapi.vercel.sh/vercel.json',
     outputDirectory: 'public',
-    rewrites,
+    routes,
   };
 
   fs.writeFileSync(outFile, `${JSON.stringify(vercelJson, null, 2)}\n`, 'utf8');
