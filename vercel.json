@@ -17,6 +17,11 @@
       "env": ["CONFIG_ORIGIN"]
     },
     {
+      "src": "^/feedback(?=/|$)(.*)$",
+      "dest": "${FEEDBACK_ORIGIN}/feedback$1",
+      "env": ["FEEDBACK_ORIGIN"]
+    },
+    {
       "src": "^/posts(?=/|$)(.*)$",
       "dest": "${POST_ORIGIN}/posts$1",
       "env": ["POST_ORIGIN"]
