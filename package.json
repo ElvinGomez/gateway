@@ -4,6 +4,7 @@
   "private": true,
   "description": "Vercel API gateway: routes in vercel.json with ${ORIGIN} from env",
   "scripts": {
+    "dev": "node --env-file=.env scripts/local-proxy.mjs",
     "build": "tsc",
     "vercel-build": "tsc"
   },
