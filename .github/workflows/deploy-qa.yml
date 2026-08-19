@@ -1,0 +1,11 @@
+name: Deploy QA
+
+on:
+  push:
+    branches: [qa]
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, mac-mini-qa]
+    steps:
+      - run: bash /Users/elvingomez/Documents/GitHub/infra/infra/qa/scripts/deploy.sh gateway
