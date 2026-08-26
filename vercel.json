@@ -22,6 +22,11 @@
       "env": ["FEEDBACK_ORIGIN"]
     },
     {
+      "src": "^/notifications(?=/|$)(.*)$",
+      "dest": "${NOTIFICATIONS_ORIGIN}/notifications$1",
+      "env": ["NOTIFICATIONS_ORIGIN"]
+    },
+    {
       "src": "^/posts(?=/|$)(.*)$",
       "dest": "${POST_ORIGIN}/posts$1",
       "env": ["POST_ORIGIN"]
