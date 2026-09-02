@@ -9,6 +9,7 @@
  *   /file              → CDN_ORIGIN
  *   /config, /internal → CONFIG_ORIGIN
  *   /feedback          → FEEDBACK_ORIGIN
+ *   /notifications     → NOTIFICATIONS_ORIGIN
  *   /posts             → POST_ORIGIN
  *   /stories           → STORIES_ORIGIN
  *   /users             → USER_MANAGEMENT_ORIGIN
@@ -37,6 +38,7 @@ const ROUTES = [
   ['/internal', 'CONFIG_ORIGIN'],
   ['/config', 'CONFIG_ORIGIN'],
   ['/feedback', 'FEEDBACK_ORIGIN'],
+  ['/notifications', 'NOTIFICATIONS_ORIGIN'],
   ['/file', 'CDN_ORIGIN'],
   ['/posts', 'POST_ORIGIN'],
   ['/stories', 'STORIES_ORIGIN'],
