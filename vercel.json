@@ -42,6 +42,11 @@
       "env": ["USER_MANAGEMENT_ORIGIN"]
     },
     {
+      "src": "^/restaurants(?=/|$)(.*)$",
+      "dest": "${RESTAURANTS_ORIGIN}/restaurants$1",
+      "env": ["RESTAURANTS_ORIGIN"]
+    },
+    {
       "src": "^/spots(?=/|$)(.*)$",
       "dest": "${SPOTS_ORIGIN}/spots$1",
       "env": ["SPOTS_ORIGIN"]

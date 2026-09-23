@@ -13,6 +13,7 @@
  *   /posts             → POST_ORIGIN
  *   /stories           → STORIES_ORIGIN
  *   /users             → USER_MANAGEMENT_ORIGIN
+ *   /restaurants       → RESTAURANTS_ORIGIN
  *   /spots, /spot, /reviews, /review → SPOTS_ORIGIN
  *   /v1                → AI_ORIGIN (optional)
  */
@@ -43,6 +44,7 @@ const ROUTES = [
   ['/posts', 'POST_ORIGIN'],
   ['/stories', 'STORIES_ORIGIN'],
   ['/users', 'USER_MANAGEMENT_ORIGIN'],
+  ['/restaurants', 'RESTAURANTS_ORIGIN'],
   ['/spots', 'SPOTS_ORIGIN'],
   ['/spot', 'SPOTS_ORIGIN'],
   ['/reviews', 'SPOTS_ORIGIN'],
