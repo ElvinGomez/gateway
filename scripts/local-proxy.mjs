@@ -14,7 +14,7 @@
  *   /stories           → STORIES_ORIGIN
  *   /users             → USER_MANAGEMENT_ORIGIN
  *   /partners          → PARTNERS_API_ORIGIN
- *   /restaurants       → PARTNERS_API_ORIGIN (falls back to RESTAURANTS_ORIGIN, the pre-rename name)
+ *   /restaurants       → PARTNERS_API_ORIGIN (restaurants vertical)
  *   /spots, /spot, /reviews, /review → SPOTS_ORIGIN
  *   /v1                → AI_ORIGIN (optional)
  */
@@ -48,8 +48,8 @@ const ROUTES = [
   ['/posts', 'POST_ORIGIN'],
   ['/stories', 'STORIES_ORIGIN'],
   ['/users', 'USER_MANAGEMENT_ORIGIN'],
-  ['/partners', ['PARTNERS_API_ORIGIN', 'RESTAURANTS_ORIGIN']],
-  ['/restaurants', ['PARTNERS_API_ORIGIN', 'RESTAURANTS_ORIGIN']],
+  ['/partners', 'PARTNERS_API_ORIGIN'],
+  ['/restaurants', 'PARTNERS_API_ORIGIN'],
   ['/spots', 'SPOTS_ORIGIN'],
   ['/spot', 'SPOTS_ORIGIN'],
   ['/reviews', 'SPOTS_ORIGIN'],
