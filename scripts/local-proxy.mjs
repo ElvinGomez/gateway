@@ -13,7 +13,8 @@
  *   /posts             → POST_ORIGIN
  *   /stories           → STORIES_ORIGIN
  *   /users             → USER_MANAGEMENT_ORIGIN
- *   /restaurants       → RESTAURANTS_ORIGIN
+ *   /partners          → PARTNERS_API_ORIGIN
+ *   /restaurants       → PARTNERS_API_ORIGIN (falls back to RESTAURANTS_ORIGIN, the pre-rename name)
  *   /spots, /spot, /reviews, /review → SPOTS_ORIGIN
  *   /v1                → AI_ORIGIN (optional)
  */
@@ -34,7 +35,10 @@ const HOP_BY_HOP = new Set([
   'host',
 ]);
 
-/** Longer prefixes first so /spots wins over /spot. */
+/**
+ * Longer prefixes first so /spots wins over /spot. A route may list several env
+ * keys; the first one that is set wins (used for renamed origins).
+ */
 const ROUTES = [
   ['/internal', 'CONFIG_ORIGIN'],
   ['/config', 'CONFIG_ORIGIN'],
@@ -44,7 +48,8 @@ const ROUTES = [
   ['/posts', 'POST_ORIGIN'],
   ['/stories', 'STORIES_ORIGIN'],
   ['/users', 'USER_MANAGEMENT_ORIGIN'],
-  ['/restaurants', 'RESTAURANTS_ORIGIN'],
+  ['/partners', ['PARTNERS_API_ORIGIN', 'RESTAURANTS_ORIGIN']],
+  ['/restaurants', ['PARTNERS_API_ORIGIN', 'RESTAURANTS_ORIGIN']],
   ['/spots', 'SPOTS_ORIGIN'],
   ['/spot', 'SPOTS_ORIGIN'],
   ['/reviews', 'SPOTS_ORIGIN'],
@@ -53,8 +58,10 @@ const ROUTES = [
 ].sort((a, b) => b[0].length - a[0].length);
 
 function originFor(pathname) {
-  for (const [prefix, envKey] of ROUTES) {
+  for (const [prefix, envKeys] of ROUTES) {
     if (pathname === prefix || pathname.startsWith(`${prefix}/`)) {
+      const keys = Array.isArray(envKeys) ? envKeys : [envKeys];
+      const envKey = keys.find((key) => (process.env[key] || '').trim()) ?? keys[0];
       const origin = (process.env[envKey] || '').trim().replace(/\/+$/, '');
       return { envKey, origin };
     }
