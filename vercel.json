@@ -48,8 +48,8 @@
     },
     {
       "src": "^/restaurants(?=/|$)(.*)$",
-      "dest": "${RESTAURANTS_ORIGIN}/restaurants$1",
-      "env": ["RESTAURANTS_ORIGIN"]
+      "dest": "${PARTNERS_API_ORIGIN}/restaurants$1",
+      "env": ["PARTNERS_API_ORIGIN"]
     },
     {
       "src": "^/spots(?=/|$)(.*)$",
