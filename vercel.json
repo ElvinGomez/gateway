@@ -42,6 +42,11 @@
       "env": ["USER_MANAGEMENT_ORIGIN"]
     },
     {
+      "src": "^/partners(?=/|$)(.*)$",
+      "dest": "${PARTNERS_API_ORIGIN}/partners$1",
+      "env": ["PARTNERS_API_ORIGIN"]
+    },
+    {
       "src": "^/restaurants(?=/|$)(.*)$",
       "dest": "${RESTAURANTS_ORIGIN}/restaurants$1",
       "env": ["RESTAURANTS_ORIGIN"]
