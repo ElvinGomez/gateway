@@ -52,6 +52,11 @@
       "env": ["PARTNERS_API_ORIGIN"]
     },
     {
+      "src": "^/hotels(?=/|$)(.*)$",
+      "dest": "${PARTNERS_API_ORIGIN}/hotels$1",
+      "env": ["PARTNERS_API_ORIGIN"]
+    },
+    {
       "src": "^/spots(?=/|$)(.*)$",
       "dest": "${SPOTS_ORIGIN}/spots$1",
       "env": ["SPOTS_ORIGIN"]

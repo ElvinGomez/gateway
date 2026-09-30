@@ -15,6 +15,7 @@
  *   /users             → USER_MANAGEMENT_ORIGIN
  *   /partners          → PARTNERS_API_ORIGIN
  *   /restaurants       → PARTNERS_API_ORIGIN (restaurants vertical)
+ *   /hotels            → PARTNERS_API_ORIGIN (hotels vertical)
  *   /spots, /spot, /reviews, /review → SPOTS_ORIGIN
  *   /v1                → AI_ORIGIN (optional)
  */
@@ -50,6 +51,7 @@ const ROUTES = [
   ['/users', 'USER_MANAGEMENT_ORIGIN'],
   ['/partners', 'PARTNERS_API_ORIGIN'],
   ['/restaurants', 'PARTNERS_API_ORIGIN'],
+  ['/hotels', 'PARTNERS_API_ORIGIN'],
   ['/spots', 'SPOTS_ORIGIN'],
   ['/spot', 'SPOTS_ORIGIN'],
   ['/reviews', 'SPOTS_ORIGIN'],
