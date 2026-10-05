@@ -14,13 +14,14 @@
  *   /stories           → STORIES_ORIGIN
  *   /users             → USER_MANAGEMENT_ORIGIN
  *   /partners          → PARTNERS_API_ORIGIN
- *   /restaurants       → PARTNERS_API_ORIGIN (restaurants vertical)
- *   /hotels            → PARTNERS_API_ORIGIN (hotels vertical)
+ *   /restaurants       → RESTAURANTS_ORIGIN
+ *   /hotels            → HOTELS_ORIGIN
  *   /spots, /spot, /reviews, /review → SPOTS_ORIGIN
  *   /v1                → AI_ORIGIN (optional)
  */
 import http from 'node:http';
 import https from 'node:https';
+import { pathToFileURL } from 'node:url';
 
 const PORT = Number(process.env.PORT) || 3080;
 
@@ -50,8 +51,8 @@ const ROUTES = [
   ['/stories', 'STORIES_ORIGIN'],
   ['/users', 'USER_MANAGEMENT_ORIGIN'],
   ['/partners', 'PARTNERS_API_ORIGIN'],
-  ['/restaurants', 'PARTNERS_API_ORIGIN'],
-  ['/hotels', 'PARTNERS_API_ORIGIN'],
+  ['/restaurants', 'RESTAURANTS_ORIGIN'],
+  ['/hotels', 'HOTELS_ORIGIN'],
   ['/spots', 'SPOTS_ORIGIN'],
   ['/spot', 'SPOTS_ORIGIN'],
   ['/reviews', 'SPOTS_ORIGIN'],
@@ -59,12 +60,12 @@ const ROUTES = [
   ['/v1', 'AI_ORIGIN'],
 ].sort((a, b) => b[0].length - a[0].length);
 
-function originFor(pathname) {
+function originFor(pathname, env) {
   for (const [prefix, envKeys] of ROUTES) {
     if (pathname === prefix || pathname.startsWith(`${prefix}/`)) {
       const keys = Array.isArray(envKeys) ? envKeys : [envKeys];
-      const envKey = keys.find((key) => (process.env[key] || '').trim()) ?? keys[0];
-      const origin = (process.env[envKey] || '').trim().replace(/\/+$/, '');
+      const envKey = keys.find((key) => (env[key] || '').trim()) ?? keys[0];
+      const origin = (env[envKey] || '').trim().replace(/\/+$/, '');
       return { envKey, origin };
     }
   }
@@ -81,7 +82,7 @@ function copyHeaders(src) {
   return out;
 }
 
-function proxy(req, res) {
+function proxy(req, res, env) {
   const incoming = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
   const pathname = incoming.pathname;
 
@@ -91,7 +92,24 @@ function proxy(req, res) {
     return;
   }
 
-  const match = originFor(pathname);
+  // Reject private routes before forwarding, including paths Express could decode
+  // or normalize differently. Public callers never reach a service's internals.
+  let normalized = pathname;
+  try {
+    for (let i = 0; i < 4; i += 1) {
+      const decoded = decodeURIComponent(normalized);
+      if (decoded === normalized) break;
+      normalized = decoded;
+    }
+    normalized = new URL(normalized.replace(/\\/g, '/').replace(/\/+/g, '/'), 'http://localhost').pathname;
+  } catch { normalized = '/partners/internal'; }
+  if (/^\/(partners|restaurants|hotels)\/internal(?:\/|$)/i.test(normalized)) {
+    res.writeHead(404, { 'content-type': 'application/json' });
+    res.end(JSON.stringify({ message: 'Not found', statusCode: 404 }));
+    return;
+  }
+
+  const match = originFor(pathname, env);
   if (!match) {
     res.writeHead(404, { 'content-type': 'application/json' });
     res.end(JSON.stringify({ message: 'No gateway route for this path', statusCode: 404 }));
@@ -161,8 +179,14 @@ function proxy(req, res) {
   req.pipe(proxyReq);
 }
 
-const server = http.createServer(proxy);
-server.timeout = 0;
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Local API gateway listening on http://127.0.0.1:${PORT}`);
-});
+export function createGatewayServer(env = process.env) {
+  const server = http.createServer((req, res) => proxy(req, res, env));
+  server.timeout = 0;
+  return server;
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  createGatewayServer().listen(PORT, '0.0.0.0', () => {
+    console.log(`Local API gateway listening on http://127.0.0.1:${PORT}`);
+  });
+}

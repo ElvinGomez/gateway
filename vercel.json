@@ -7,6 +7,10 @@
       "dest": "/api/health"
     },
     {
+      "src": "^/+(?:[pP][aA][rR][tT][nN][eE][rR][sS]|[rR][eE][sS][tT][aA][uU][rR][aA][nN][tT][sS]|[hH][oO][tT][eE][lL][sS])(?=/|%)(?:.*%.*|/+[iI][nN][tT][eE][rR][nN][aA][lL](?:/.*)?$|/{2,}.*)$",
+      "status": 404
+    },
+    {
       "src": "^/file(?=/|$)(.*)$",
       "dest": "${CDN_ORIGIN}/file$1",
       "env": ["CDN_ORIGIN"]
@@ -48,13 +52,13 @@
     },
     {
       "src": "^/restaurants(?=/|$)(.*)$",
-      "dest": "${PARTNERS_API_ORIGIN}/restaurants$1",
-      "env": ["PARTNERS_API_ORIGIN"]
+      "dest": "${RESTAURANTS_ORIGIN}/restaurants$1",
+      "env": ["RESTAURANTS_ORIGIN"]
     },
     {
       "src": "^/hotels(?=/|$)(.*)$",
-      "dest": "${PARTNERS_API_ORIGIN}/hotels$1",
-      "env": ["PARTNERS_API_ORIGIN"]
+      "dest": "${HOTELS_ORIGIN}/hotels$1",
+      "env": ["HOTELS_ORIGIN"]
     },
     {
       "src": "^/spots(?=/|$)(.*)$",
