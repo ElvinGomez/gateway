@@ -19,6 +19,7 @@
  *   /spots, /spot, /reviews, /review → SPOTS_ORIGIN
  *   /v1                → AI_ORIGIN (optional)
  */
+import { realpathSync } from 'node:fs';
 import http from 'node:http';
 import https from 'node:https';
 import { pathToFileURL } from 'node:url';
@@ -185,7 +186,9 @@ export function createGatewayServer(env = process.env) {
   return server;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// import.meta.url is the resolved path; argv[1] may go through a symlink
+// (QA runs releases/gateway/current/...), so compare real paths.
+if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   createGatewayServer().listen(PORT, '0.0.0.0', () => {
     console.log(`Local API gateway listening on http://127.0.0.1:${PORT}`);
   });
