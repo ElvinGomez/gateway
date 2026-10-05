@@ -186,9 +186,11 @@ export function createGatewayServer(env = process.env) {
   return server;
 }
 
-// import.meta.url is the resolved path; argv[1] may go through a symlink
-// (QA runs releases/gateway/current/...), so compare real paths.
-if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
+// pm2 (QA) loads this file from its own container, so argv[1] is not the
+// script; it exposes the real entry as pm_exec_path. Either path may go through
+// a symlink (releases/gateway/current/...), while import.meta.url is resolved.
+const entry = process.env.pm_exec_path || process.argv[1];
+if (entry && import.meta.url === pathToFileURL(realpathSync(entry)).href) {
   createGatewayServer().listen(PORT, '0.0.0.0', () => {
     console.log(`Local API gateway listening on http://127.0.0.1:${PORT}`);
   });
