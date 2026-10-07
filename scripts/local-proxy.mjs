@@ -13,11 +13,16 @@
  *   /posts             → POST_ORIGIN
  *   /stories           → STORIES_ORIGIN
  *   /users             → USER_MANAGEMENT_ORIGIN
+ *   /partners          → PARTNERS_API_ORIGIN
+ *   /restaurants       → RESTAURANTS_ORIGIN
+ *   /hotels            → HOTELS_ORIGIN
  *   /spots, /spot, /reviews, /review → SPOTS_ORIGIN
  *   /v1                → AI_ORIGIN (optional)
  */
+import { realpathSync } from 'node:fs';
 import http from 'node:http';
 import https from 'node:https';
+import { pathToFileURL } from 'node:url';
 
 const PORT = Number(process.env.PORT) || 3080;
 
@@ -33,7 +38,10 @@ const HOP_BY_HOP = new Set([
   'host',
 ]);
 
-/** Longer prefixes first so /spots wins over /spot. */
+/**
+ * Longer prefixes first so /spots wins over /spot. A route may list several env
+ * keys; the first one that is set wins (used for renamed origins).
+ */
 const ROUTES = [
   ['/internal', 'CONFIG_ORIGIN'],
   ['/config', 'CONFIG_ORIGIN'],
@@ -43,6 +51,9 @@ const ROUTES = [
   ['/posts', 'POST_ORIGIN'],
   ['/stories', 'STORIES_ORIGIN'],
   ['/users', 'USER_MANAGEMENT_ORIGIN'],
+  ['/partners', 'PARTNERS_API_ORIGIN'],
+  ['/restaurants', 'RESTAURANTS_ORIGIN'],
+  ['/hotels', 'HOTELS_ORIGIN'],
   ['/spots', 'SPOTS_ORIGIN'],
   ['/spot', 'SPOTS_ORIGIN'],
   ['/reviews', 'SPOTS_ORIGIN'],
@@ -50,10 +61,12 @@ const ROUTES = [
   ['/v1', 'AI_ORIGIN'],
 ].sort((a, b) => b[0].length - a[0].length);
 
-function originFor(pathname) {
-  for (const [prefix, envKey] of ROUTES) {
+function originFor(pathname, env) {
+  for (const [prefix, envKeys] of ROUTES) {
     if (pathname === prefix || pathname.startsWith(`${prefix}/`)) {
-      const origin = (process.env[envKey] || '').trim().replace(/\/+$/, '');
+      const keys = Array.isArray(envKeys) ? envKeys : [envKeys];
+      const envKey = keys.find((key) => (env[key] || '').trim()) ?? keys[0];
+      const origin = (env[envKey] || '').trim().replace(/\/+$/, '');
       return { envKey, origin };
     }
   }
@@ -70,7 +83,7 @@ function copyHeaders(src) {
   return out;
 }
 
-function proxy(req, res) {
+function proxy(req, res, env) {
   const incoming = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
   const pathname = incoming.pathname;
 
@@ -80,7 +93,24 @@ function proxy(req, res) {
     return;
   }
 
-  const match = originFor(pathname);
+  // Reject private routes before forwarding, including paths Express could decode
+  // or normalize differently. Public callers never reach a service's internals.
+  let normalized = pathname;
+  try {
+    for (let i = 0; i < 4; i += 1) {
+      const decoded = decodeURIComponent(normalized);
+      if (decoded === normalized) break;
+      normalized = decoded;
+    }
+    normalized = new URL(normalized.replace(/\\/g, '/').replace(/\/+/g, '/'), 'http://localhost').pathname;
+  } catch { normalized = '/partners/internal'; }
+  if (/^\/(partners|restaurants|hotels)\/internal(?:\/|$)/i.test(normalized)) {
+    res.writeHead(404, { 'content-type': 'application/json' });
+    res.end(JSON.stringify({ message: 'Not found', statusCode: 404 }));
+    return;
+  }
+
+  const match = originFor(pathname, env);
   if (!match) {
     res.writeHead(404, { 'content-type': 'application/json' });
     res.end(JSON.stringify({ message: 'No gateway route for this path', statusCode: 404 }));
@@ -150,8 +180,18 @@ function proxy(req, res) {
   req.pipe(proxyReq);
 }
 
-const server = http.createServer(proxy);
-server.timeout = 0;
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Local API gateway listening on http://127.0.0.1:${PORT}`);
-});
+export function createGatewayServer(env = process.env) {
+  const server = http.createServer((req, res) => proxy(req, res, env));
+  server.timeout = 0;
+  return server;
+}
+
+// pm2 (QA) loads this file from its own container, so argv[1] is not the
+// script; it exposes the real entry as pm_exec_path. Either path may go through
+// a symlink (releases/gateway/current/...), while import.meta.url is resolved.
+const entry = process.env.pm_exec_path || process.argv[1];
+if (entry && import.meta.url === pathToFileURL(realpathSync(entry)).href) {
+  createGatewayServer().listen(PORT, '0.0.0.0', () => {
+    console.log(`Local API gateway listening on http://127.0.0.1:${PORT}`);
+  });
+}
