@@ -7,7 +7,7 @@
       "dest": "/api/health"
     },
     {
-      "src": "^/+(?:[pP][aA][rR][tT][nN][eE][rR][sS]|[rR][eE][sS][tT][aA][uU][rR][aA][nN][tT][sS]|[hH][oO][tT][eE][lL][sS])(?=/|%)(?:.*%.*|/+[iI][nN][tT][eE][rR][nN][aA][lL](?:/.*)?$|/{2,}.*)$",
+      "src": "^/+(?:[pP][aA][rR][tT][nN][eE][rR][sS]|[rR][eE][sS][tT][aA][uU][rR][aA][nN][tT][sS]|[hH][oO][tT][eE][lL][sS]|[cC][oO][mM][mM][eE][rR][cC][iI][aA][lL])(?=/|%)(?:.*%.*|/+[iI][nN][tT][eE][rR][nN][aA][lL](?:/.*)?$|/{2,}.*)$",
       "status": 404
     },
     {
@@ -44,6 +44,11 @@
       "src": "^/users(?=/|$)(.*)$",
       "dest": "${USER_MANAGEMENT_ORIGIN}/users$1",
       "env": ["USER_MANAGEMENT_ORIGIN"]
+    },
+    {
+      "src": "^/commercial(?=/|$)(.*)$",
+      "dest": "${COMMERCIAL_API_ORIGIN}/commercial$1",
+      "env": ["COMMERCIAL_API_ORIGIN"]
     },
     {
       "src": "^/partners(?=/|$)(.*)$",
