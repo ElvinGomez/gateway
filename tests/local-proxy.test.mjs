@@ -13,7 +13,7 @@ async function listen(server) {
 }
 before(async () => {
   const env = {};
-  for (const [name, key] of [['partners', 'PARTNERS_API_ORIGIN'], ['restaurants', 'RESTAURANTS_ORIGIN'], ['hotels', 'HOTELS_ORIGIN']]) {
+  for (const [name, key] of [['partners', 'PARTNERS_API_ORIGIN'], ['restaurants', 'RESTAURANTS_ORIGIN'], ['hotels', 'HOTELS_ORIGIN'], ['commercial', 'COMMERCIAL_API_ORIGIN']]) {
     env[key] = await listen(http.createServer(async (req, res) => {
       let body = '';
       for await (const chunk of req) body += chunk;
@@ -25,7 +25,7 @@ before(async () => {
 });
 after(async () => { await Promise.all(servers.map((server) => new Promise((resolve) => { server.closeAllConnections(); server.close(resolve); }))); });
 
-for (const vertical of ['partners', 'restaurants', 'hotels']) {
+for (const vertical of ['partners', 'restaurants', 'hotels', 'commercial']) {
   test(`routes ${vertical} and preserves request and response semantics`, async () => {
     const response = await fetch(`${gateway}/${vertical}/some-id?x=one%20two`, {
       method: 'PATCH', headers: { authorization: 'Bearer test', 'content-type': 'application/json' }, body: '{"title":"New"}',
@@ -42,7 +42,7 @@ for (const vertical of ['partners', 'restaurants', 'hotels']) {
 test('does not route /hotelsx to hotels', async () => { assert.equal((await fetch(`${gateway}/hotelsx`)).status, 404); });
 test('deployment routes use the same distinct origins and reject internal paths first', () => {
   const { routes } = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url)));
-  for (const [prefix, key] of [['partners', 'PARTNERS_API_ORIGIN'], ['restaurants', 'RESTAURANTS_ORIGIN'], ['hotels', 'HOTELS_ORIGIN']]) {
+  for (const [prefix, key] of [['partners', 'PARTNERS_API_ORIGIN'], ['restaurants', 'RESTAURANTS_ORIGIN'], ['hotels', 'HOTELS_ORIGIN'], ['commercial', 'COMMERCIAL_API_ORIGIN']]) {
     const route = routes.find((route) => route.dest === '${' + key + '}/' + prefix + '$1');
     assert.ok(route);
     const denied = routes.find((route) => new RegExp(route.src).test(`/${prefix}/internal/query`));
