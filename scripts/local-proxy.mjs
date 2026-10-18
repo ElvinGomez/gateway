@@ -85,6 +85,12 @@ function copyHeaders(src) {
   return out;
 }
 
+function clientAddress(req) {
+  const cloudflare = req.headers['cf-connecting-ip'];
+  if (typeof cloudflare === 'string' && cloudflare.trim()) return cloudflare.trim();
+  return (req.socket.remoteAddress || 'unknown').replace(/^::ffff:/, '');
+}
+
 function proxy(req, res, env) {
   const incoming = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
   const pathname = incoming.pathname;
@@ -142,6 +148,10 @@ function proxy(req, res, env) {
   const transport = isTls ? https : http;
   const headers = copyHeaders(req.headers);
   headers.host = target.host;
+  // The person's address for the services' rate limits, like Vercel's `x-real-ip`: Cloudflare's
+  // when the request came through the tunnel, else the socket's. What the client sent is replaced.
+  headers['x-real-ip'] = clientAddress(req);
+  delete headers['x-tripsi-client-ip'];
 
   const proxyReq = transport.request(
     {

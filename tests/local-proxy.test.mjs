@@ -49,3 +49,16 @@ test('deployment routes use the same distinct origins and reject internal paths 
     assert.equal(denied.status, 404);
   }
 });
+test('sends the person\'s address in x-real-ip and drops the address headers a client makes up', async () => {
+  const upstream = await listen(http.createServer((req, res) => {
+    res.writeHead(200, { 'content-type': 'application/json' });
+    res.end(JSON.stringify({ realIp: req.headers['x-real-ip'], clientIp: req.headers['x-tripsi-client-ip'] ?? null }));
+  }));
+  const proxy = await listen(createGatewayServer({ PARTNERS_API_ORIGIN: upstream }));
+  const spoofed = await fetch(`${proxy}/partners/listings/restaurants/r1/coupons`, {
+    headers: { 'x-real-ip': '6.6.6.6', 'x-tripsi-client-ip': '6.6.6.6' },
+  });
+  assert.deepEqual(await spoofed.json(), { realIp: '127.0.0.1', clientIp: null });
+  const viaTunnel = await fetch(`${proxy}/partners/listings/restaurants/r1/coupons`, { headers: { 'cf-connecting-ip': '203.0.113.9' } });
+  assert.deepEqual(await viaTunnel.json(), { realIp: '203.0.113.9', clientIp: null });
+});
