@@ -112,7 +112,7 @@ function proxy(req, res, env) {
     }
     normalized = new URL(normalized.replace(/\\/g, '/').replace(/\/+/g, '/'), 'http://localhost').pathname;
   } catch { normalized = '/partners/internal'; }
-  if (/^\/(partners|restaurants|hotels|commercial)\/internal(?:\/|$)/i.test(normalized)) {
+  if (/^\/(partners|restaurants|hotels|commercial|stories)\/internal(?:\/|$)/i.test(normalized)) {
     res.writeHead(404, { 'content-type': 'application/json' });
     res.end(JSON.stringify({ message: 'Not found', statusCode: 404 }));
     return;
