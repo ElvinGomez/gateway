@@ -12,6 +12,7 @@
  *   /notifications     → NOTIFICATIONS_ORIGIN
  *   /posts             → POST_ORIGIN
  *   /stories           → STORIES_ORIGIN
+ *   /rewards           → REWARDS_ORIGIN
  *   /users             → USER_MANAGEMENT_ORIGIN
  *   /commercial        → COMMERCIAL_API_ORIGIN
  *   /partners          → PARTNERS_API_ORIGIN
@@ -51,6 +52,7 @@ const ROUTES = [
   ['/file', 'CDN_ORIGIN'],
   ['/posts', 'POST_ORIGIN'],
   ['/stories', 'STORIES_ORIGIN'],
+  ['/rewards', 'REWARDS_ORIGIN'],
   ['/users', 'USER_MANAGEMENT_ORIGIN'],
   ['/commercial', 'COMMERCIAL_API_ORIGIN'],
   ['/partners', 'PARTNERS_API_ORIGIN'],
@@ -112,7 +114,7 @@ function proxy(req, res, env) {
     }
     normalized = new URL(normalized.replace(/\\/g, '/').replace(/\/+/g, '/'), 'http://localhost').pathname;
   } catch { normalized = '/partners/internal'; }
-  if (/^\/(partners|restaurants|hotels|commercial|stories)\/internal(?:\/|$)/i.test(normalized)) {
+  if (/^\/(partners|restaurants|hotels|commercial|stories|rewards)\/internal(?:\/|$)/i.test(normalized)) {
     res.writeHead(404, { 'content-type': 'application/json' });
     res.end(JSON.stringify({ message: 'Not found', statusCode: 404 }));
     return;

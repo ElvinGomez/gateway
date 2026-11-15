@@ -2,9 +2,10 @@
 
 Public entry for the Tripsi APIs: `api.tripsi.app` (production) and `qa.tripsi.app` (QA). On Vercel
 it is only rewrites (`vercel.json`) that forward each prefix (`/spots`, `/partners`, `/restaurants`,
-`/hotels`, `/commercial`, `/users`, `/config`, `/feedback`, `/notifications`, `/file`, `/posts`, …) to
-its service origin (`*_ORIGIN` env vars). Requests to `*/internal/*` of the business services are
-rejected with 404 before routing. Yarn.
+`/hotels`, `/commercial`, `/users`, `/config`, `/feedback`, `/notifications`, `/file`, `/posts`,
+`/stories`, `/rewards`, …) to
+its service origin (`*_ORIGIN` env vars). Requests to `*/internal/*` of the business services, stories and rewards
+are rejected with 404 before routing. Yarn.
 
 ## Local
 

@@ -7,7 +7,7 @@
       "dest": "/api/health"
     },
     {
-      "src": "^/+(?:[pP][aA][rR][tT][nN][eE][rR][sS]|[rR][eE][sS][tT][aA][uU][rR][aA][nN][tT][sS]|[hH][oO][tT][eE][lL][sS]|[cC][oO][mM][mM][eE][rR][cC][iI][aA][lL])(?=/|%)(?:.*%.*|/+[iI][nN][tT][eE][rR][nN][aA][lL](?:/.*)?$|/{2,}.*)$",
+      "src": "^/+(?:[pP][aA][rR][tT][nN][eE][rR][sS]|[rR][eE][sS][tT][aA][uU][rR][aA][nN][tT][sS]|[hH][oO][tT][eE][lL][sS]|[cC][oO][mM][mM][eE][rR][cC][iI][aA][lL]|[sS][tT][oO][rR][iI][eE][sS]|[rR][eE][wW][aA][rR][dD][sS])(?=/|%)(?:.*%.*|/+[iI][nN][tT][eE][rR][nN][aA][lL](?:/.*)?$|/{2,}.*)$",
       "status": 404
     },
     {
@@ -39,6 +39,11 @@
       "src": "^/stories(?=/|$)(.*)$",
       "dest": "${STORIES_ORIGIN}/stories$1",
       "env": ["STORIES_ORIGIN"]
+    },
+    {
+      "src": "^/rewards(?=/|$)(.*)$",
+      "dest": "${REWARDS_ORIGIN}/rewards$1",
+      "env": ["REWARDS_ORIGIN"]
     },
     {
       "src": "^/users(?=/|$)(.*)$",
