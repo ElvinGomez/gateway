@@ -28,6 +28,20 @@ import { pathToFileURL } from 'node:url';
 
 const PORT = Number(process.env.PORT) || 3080;
 
+// Long-lived streams (feature flags SSE) must not hit the upstream idle timeout.
+const STREAM_PATHS = new Set(['/config/stream']);
+
+function msFrom(env, key, fallback) {
+  if (env[key] === undefined || String(env[key]).trim() === '') return fallback;
+  const value = Number(env[key]);
+  return Number.isFinite(value) && value >= 0 ? value : fallback;
+}
+
+function sendJson(res, statusCode, message) {
+  res.writeHead(statusCode, { 'content-type': 'application/json' });
+  res.end(JSON.stringify({ message, statusCode }));
+}
+
 const HOP_BY_HOP = new Set([
   'connection',
   'keep-alive',
@@ -126,14 +140,10 @@ function proxy(req, res, env) {
     res.end(JSON.stringify({ message: 'No gateway route for this path', statusCode: 404 }));
     return;
   }
+  // Clients get a generic 502; the variable name and cause stay in the gateway log.
   if (!match.origin) {
-    res.writeHead(502, { 'content-type': 'application/json' });
-    res.end(
-      JSON.stringify({
-        message: `${match.envKey} is not set`,
-        statusCode: 502,
-      }),
-    );
+    console.error(`[gateway] ${match.envKey} is not set (${req.method} ${pathname})`);
+    sendJson(res, 502, 'Bad gateway');
     return;
   }
 
@@ -141,8 +151,8 @@ function proxy(req, res, env) {
   try {
     target = new URL(`${pathname}${incoming.search}`, `${match.origin}/`);
   } catch {
-    res.writeHead(502, { 'content-type': 'application/json' });
-    res.end(JSON.stringify({ message: `Invalid ${match.envKey}`, statusCode: 502 }));
+    console.error(`[gateway] invalid ${match.envKey} (${req.method} ${pathname})`);
+    sendJson(res, 502, 'Bad gateway');
     return;
   }
 
@@ -152,8 +162,15 @@ function proxy(req, res, env) {
   headers.host = target.host;
   // The person's address for the services' rate limits, like Vercel's `x-real-ip`: Cloudflare's
   // when the request came through the tunnel, else the socket's. What the client sent is replaced.
-  headers['x-real-ip'] = clientAddress(req);
+  // `x-forwarded-for` is overwritten too (as Vercel does): services read its first value, and
+  // Cloudflare only appends to whatever the client sent.
+  const clientIp = clientAddress(req);
+  headers['x-real-ip'] = clientIp;
+  headers['x-forwarded-for'] = clientIp;
   delete headers['x-tripsi-client-ip'];
+
+  const isStream = STREAM_PATHS.has(pathname);
+  const upstreamIdleMs = isStream ? 0 : msFrom(env, 'GATEWAY_UPSTREAM_TIMEOUT_MS', 60_000);
 
   const proxyReq = transport.request(
     {
@@ -163,7 +180,7 @@ function proxy(req, res, env) {
       path: `${target.pathname}${target.search}`,
       method: req.method,
       headers,
-      timeout: 0,
+      timeout: upstreamIdleMs,
     },
     (proxyRes) => {
       const outHeaders = copyHeaders(proxyRes.headers);
@@ -172,32 +189,67 @@ function proxy(req, res, env) {
     },
   );
 
+  let timedOut = false;
   proxyReq.on('timeout', () => {
+    timedOut = true;
     proxyReq.destroy();
   });
 
   proxyReq.on('error', (err) => {
+    const code = err && typeof err === 'object' && 'code' in err ? String(err.code) : '';
+    console.error(
+      `[gateway] upstream ${match.envKey} ${timedOut ? 'timed out' : 'failed'}${code ? ` (${code})` : ''} (${req.method} ${pathname})`,
+    );
     if (res.headersSent) {
       res.end();
       return;
     }
-    const code = err && typeof err === 'object' && 'code' in err ? String(err.code) : '';
-    res.writeHead(502, { 'content-type': 'application/json' });
-    res.end(
-      JSON.stringify({
-        message: `Upstream ${match.envKey} failed${code ? ` (${code})` : ''}`,
-        statusCode: 502,
-      }),
-    );
+    sendJson(res, timedOut ? 504 : 502, timedOut ? 'Gateway timeout' : 'Bad gateway');
   });
+
+  if (env.GATEWAY_ACCESS_LOG === '1') {
+    const startedAt = process.hrtime.bigint();
+    res.on('finish', () => {
+      const ms = Number(process.hrtime.bigint() - startedAt) / 1e6;
+      // Path only: query strings can carry signed URLs or tokens.
+      console.log(JSON.stringify({ method: req.method, path: pathname, status: res.statusCode, ms: Math.round(ms), upstream: match.envKey }));
+    });
+  }
 
   req.pipe(proxyReq);
 }
 
 export function createGatewayServer(env = process.env) {
   const server = http.createServer((req, res) => proxy(req, res, env));
+  // No socket inactivity timeout: the flags SSE stays open. Requests are bounded instead by
+  // headers/request timeouts, and upstream calls by GATEWAY_UPSTREAM_TIMEOUT_MS.
   server.timeout = 0;
+  // Longer than the idle timeout of the proxy in front (Traefik: 90 s), so the gateway never
+  // closes a kept-alive connection the proxy is about to reuse (that race surfaces as 502s).
+  server.keepAliveTimeout = msFrom(env, 'GATEWAY_KEEPALIVE_TIMEOUT_MS', 95_000);
+  server.headersTimeout = Math.max(msFrom(env, 'GATEWAY_HEADERS_TIMEOUT_MS', 100_000), server.keepAliveTimeout + 1_000);
+  server.requestTimeout = msFrom(env, 'GATEWAY_REQUEST_TIMEOUT_MS', 120_000);
   return server;
+}
+
+/** Stops accepting connections and lets in-flight requests finish, up to `graceMs`. */
+export function shutdownGracefully(server, graceMs = 10_000) {
+  return new Promise((resolve) => {
+    const force = setTimeout(() => {
+      server.closeAllConnections();
+      resolve();
+    }, graceMs);
+    force.unref();
+    // Keep-alive connections turn idle after their last response; close them as they do.
+    const sweep = setInterval(() => server.closeIdleConnections(), 100);
+    sweep.unref();
+    server.close(() => {
+      clearTimeout(force);
+      clearInterval(sweep);
+      resolve();
+    });
+    server.closeIdleConnections();
+  });
 }
 
 // pm2 (QA) loads this file from its own container, so argv[1] is not the
@@ -205,7 +257,15 @@ export function createGatewayServer(env = process.env) {
 // a symlink (releases/gateway/current/...), while import.meta.url is resolved.
 const entry = process.env.pm_exec_path || process.argv[1];
 if (entry && import.meta.url === pathToFileURL(realpathSync(entry)).href) {
-  createGatewayServer().listen(PORT, '0.0.0.0', () => {
+  const server = createGatewayServer();
+  server.listen(PORT, '0.0.0.0', () => {
     console.log(`Local API gateway listening on http://127.0.0.1:${PORT}`);
   });
+  // Containers get SIGTERM on every redeploy; let in-flight requests finish first.
+  for (const signal of ['SIGTERM', 'SIGINT']) {
+    process.once(signal, () => {
+      console.log(`[gateway] ${signal}: draining connections`);
+      shutdownGracefully(server, msFrom(process.env, 'GATEWAY_SHUTDOWN_GRACE_MS', 10_000)).then(() => process.exit(0));
+    });
+  }
 }

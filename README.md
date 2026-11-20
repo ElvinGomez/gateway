@@ -26,3 +26,19 @@ yarn build
 
 A new service needs: a route in `vercel.json`, its `*_ORIGIN` in the Vercel project and in
 `.env.example`, and the same mapping in `scripts/local-proxy.mjs`.
+
+## Self-hosted (Docker)
+
+`Dockerfile` runs `scripts/local-proxy.mjs` as the production gateway (plan:
+`docs/plans/2026-11-20-vps-self-hosting-migration`). Behaviour that matters there:
+
+- `x-forwarded-for` and `x-real-ip` are **overwritten** with `CF-Connecting-IP` (or the socket
+  address). Services read the first XFF value, and Cloudflare only appends to what the client
+  sent. Only expose the gateway through Cloudflare, or the header can be forged.
+- 502/504 bodies are generic (`Bad gateway` / `Gateway timeout`); the origin variable and cause go
+  to the log.
+- Timeouts (ms, all optional): `GATEWAY_UPSTREAM_TIMEOUT_MS` (60000, idle upstream; not applied to
+  `/config/stream`), `GATEWAY_KEEPALIVE_TIMEOUT_MS` (95000, above Traefik's 90 s idle),
+  `GATEWAY_HEADERS_TIMEOUT_MS` (100000), `GATEWAY_REQUEST_TIMEOUT_MS` (120000),
+  `GATEWAY_SHUTDOWN_GRACE_MS` (10000, drain on SIGTERM).
+- `GATEWAY_ACCESS_LOG=1` logs one JSON line per request (method, path without query, status, ms).
